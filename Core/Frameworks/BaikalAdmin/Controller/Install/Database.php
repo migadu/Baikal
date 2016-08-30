@@ -239,6 +239,7 @@ class Database extends \Flake\Core\Controller {
             }
             // SQLite
         }
+        }
     }
 
     function hideMySQLFieldWhenNeeded(\Formal\Form $oForm, \Formal\Form\Morphology $oMorpho) {
