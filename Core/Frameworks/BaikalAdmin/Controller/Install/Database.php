@@ -249,7 +249,7 @@ class Database extends \Flake\Core\Controller {
             $bPostgres = (intval($oForm->postValue("PROJECT_DB_POSTGRES")) === 1);
         } else {
             $bMySQL = PROJECT_DB_MYSQL;
-            $bPOSTGRES = PROJECT_DB_MYSQL;
+            $bPostgres = PROJECT_DB_MYSQL;
         }
 
         if ($bMySQL === true) {
