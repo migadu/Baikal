@@ -43,10 +43,10 @@ class Tools {
             die('Baikal Fatal Error: PDO is unavailable. It\'s required by Baikal.');
         }
 
-        # Asserting PDO::SQLite or PDO::MySQL
+        # Asserting PDO::SQLite or PDO::MySQL or PDO::Postgres
         $aPDODrivers = \PDO::getAvailableDrivers();
-        if (!in_array('sqlite', $aPDODrivers) && !in_array('mysql', $aPDODrivers)) {
-            die('<strong>Baikal Fatal Error</strong>: Both <strong>PDO::sqlite</strong> and <strong>PDO::mysql</strong> are unavailable. One of them at least is required by Baikal.');
+        if (!in_array('sqlite', $aPDODrivers) && !in_array('mysql', $aPDODrivers) && !in_array('postgres', $aPDODrivers)) {
+            die('<strong>Baikal Fatal Error</strong>: <strong>PDO::sqlite</strong>, <strong>PDO::mysql</strong> and <strong>PDO::postgres</strong> are unavailable. One of them at least is required by Baikal.');
         }
     }
 
@@ -69,7 +69,7 @@ class Tools {
 
         # Asserting that the database is structurally complete
         #if(($aMissingTables = self::isDBStructurallyComplete($GLOBALS["DB"])) !== TRUE) {
-        #	throw new \Exception("<strong>Fatal error</strong>: Database is not structurally complete; missing tables are: <strong>" . implode("</strong>, <strong>", $aMissingTables) . "</strong>");
+        #       throw new \Exception("<strong>Fatal error</strong>: Database is not structurally complete; missing tables are: <strong>" . implode("</strong>, <strong>", $aMissingTables) . "</strong>");
         #}
 
         # Asserting config file exists

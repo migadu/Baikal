@@ -65,18 +65,35 @@ class System extends \Flake\Core\Controller {
     function morphologyHook(\Formal\Form $oForm, \Formal\Form\Morphology $oMorpho) {
         if ($oForm->submitted()) {
             $bMySQL = (intval($oForm->postValue("PROJECT_DB_MYSQL")) === 1);
+            $bPostgres = (intval($oForm->postValue("PROJECT_DB_POSTGRES")) === 1);
         } else {
             $bMySQL = PROJECT_DB_MYSQL;
+            $bPostgres = PROJECT_DB_POSTGRES;
         }
 
         if ($bMySQL === true) {
             $oMorpho->remove("PROJECT_SQLITE_FILE");
+            $oMorpho->remove("PROJECT_DB_POSTGRES_HOST");
+            $oMorpho->remove("PROJECT_DB_POSTGRES_DBNAME");
+            $oMorpho->remove("PROJECT_DB_POSTGRES_USERNAME");
+            $oMorpho->remove("PROJECT_DB_POSTGRES_PASSWORD");
         } else {
-
+          if ($bPostgres === true) {
+            $oMorpho->remove("PROJECT_SQLITE_FILE");
             $oMorpho->remove("PROJECT_DB_MYSQL_HOST");
             $oMorpho->remove("PROJECT_DB_MYSQL_DBNAME");
             $oMorpho->remove("PROJECT_DB_MYSQL_USERNAME");
             $oMorpho->remove("PROJECT_DB_MYSQL_PASSWORD");
+        } else {
+            $oMorpho->remove("PROJECT_DB_MYSQL_HOST");
+            $oMorpho->remove("PROJECT_DB_MYSQL_DBNAME");
+            $oMorpho->remove("PROJECT_DB_MYSQL_USERNAME");
+            $oMorpho->remove("PROJECT_DB_MYSQL_PASSWORD");
+            $oMorpho->remove("PROJECT_DB_POSTGRES_HOST");
+            $oMorpho->remove("PROJECT_DB_POSTGRES_DBNAME");
+            $oMorpho->remove("PROJECT_DB_POSTGRES_USERNAME");
+            $oMorpho->remove("PROJECT_DB_POSTGRES_PASSWORD");
+        }
         }
     }
 
@@ -115,6 +132,40 @@ class System extends \Flake\Core\Controller {
                 $sMessage .= "<br /><br /><strong>Nothing has been saved</strong>";
 
                 $oForm->declareError($oMorpho->element("PROJECT_DB_MYSQL"), $sMessage);
+                return;
+            }
+        } else {
+        if (intval($oForm->modelInstance()->get("PROJECT_DB_POSTGRES")) === 1) {
+
+            # We have to check the Postgres connection
+            $sHost = $oForm->modelInstance()->get("PROJECT_DB_POSTGRES_HOST");
+            $sDbName = $oForm->modelInstance()->get("PROJECT_DB_POSTGRES_DBNAME");
+            $sUsername = $oForm->modelInstance()->get("PROJECT_DB_POSTGRES_USERNAME");
+            $sPassword = $oForm->modelInstance()->get("PROJECT_DB_POSTGRES_PASSWORD");
+
+            try {
+                $oDB = new \Flake\Core\Database\Postgres(
+                    $sHost,
+                    $sDbName,
+                    $sUsername,
+                    $sPassword
+                );
+            } catch (\Exception $e) {
+                $sMessage = "<strong>Postgres error:</strong> " . $e->getMessage();
+                $sMessage .= "<br /><strong>Nothing has been saved</strong>";
+                $oForm->declareError($oMorpho->element("PROJECT_DB_POSTGRES_HOST"), $sMessage);
+                $oForm->declareError($oMorpho->element("PROJECT_DB_POSTGRES_DBNAME"));
+                $oForm->declareError($oMorpho->element("PROJECT_DB_POSTGRES_USERNAME"));
+                $oForm->declareError($oMorpho->element("PROJECT_DB_POSTGRES_PASSWORD"));
+                return;
+            }
+
+            if (($aMissingTables = \Baikal\Core\Tools::isDBStructurallyComplete($oDB)) !== true) {
+                $sMessage = "<strong>Postgres error:</strong> These tables, required by Baïkal, are missing: <strong>" . implode(", ", $aMissingTables) . "</strong><br />";
+                $sMessage .= "You may want create these tables using the file <strong>Core/Resources/Db/Postgres/db.sql</strong>";
+                $sMessage .= "<br /><br /><strong>Nothing has been saved</strong>";
+
+                $oForm->declareError($oMorpho->element("PROJECT_DB_POSTGRES"), $sMessage);
                 return;
             }
         } else {
@@ -165,6 +216,7 @@ class System extends \Flake\Core\Controller {
                         "Baïkal was not able to establish a connexion to the SQLite database as configured.<br />SQLite says: " . $e->getMessage() . (string)$e
                         );
             }
+        }
         }
     }
 }

@@ -54,16 +54,41 @@ class Database extends \Baikal\Model\Config {
             "type"    => "string",
             "comment" => "MySQL > Password",
         ],
+        "PROJECT_DB_POSTGRES" => [
+            "type"    => "boolean",
+            "comment" => "Postgres > Use Postgres instead of SQLite ?",
+        ],
+        "PROJECT_DB_POSTGRES_HOST" => [
+            "type"    => "string",
+            "comment" => "Postgres > Host, including ':portnumber' if port is not the default one (3306)",
+        ],
+        "PROJECT_DB_POSTGRES_DBNAME" => [
+            "type"    => "string",
+            "comment" => "Postgres > Database name",
+        ],
+        "PROJECT_DB_POSTGRES_USERNAME" => [
+            "type"    => "string",
+            "comment" => "Postgres > Username",
+        ],
+        "PROJECT_DB_POSTGRES_PASSWORD" => [
+            "type"    => "string",
+            "comment" => "Postgres > Password",
+        ],
     ];
 
     # Default values
     protected $aData = [
-        "PROJECT_SQLITE_FILE"       => 'PROJECT_PATH_SPECIFIC . "db/db.sqlite"',
-        "PROJECT_DB_MYSQL"          => false,
-        "PROJECT_DB_MYSQL_HOST"     => "",
-        "PROJECT_DB_MYSQL_DBNAME"   => "",
-        "PROJECT_DB_MYSQL_USERNAME" => "",
-        "PROJECT_DB_MYSQL_PASSWORD" => "",
+        "PROJECT_SQLITE_FILE"           => 'PROJECT_PATH_SPECIFIC . "db/db.sqlite"',
+        "PROJECT_DB_MYSQL"              => false,
+        "PROJECT_DB_MYSQL_HOST"         => "",
+        "PROJECT_DB_MYSQL_DBNAME"       => "",
+        "PROJECT_DB_MYSQL_USERNAME"     => "",
+        "PROJECT_DB_MYSQL_PASSWORD"     => "",
+        "PROJECT_DB_POSTGRES"           => false,
+        "PROJECT_DB_POSTGRES_HOST"      => "",
+        "PROJECT_DB_POSTGRES_DBNAME"    => "",
+        "PROJECT_DB_POSTGRES_USERNAME"  => "",
+        "PROJECT_DB_POSTGRES_PASSWORD"  => "",
     ];
 
     function formMorphologyForThisModelInstance() {
@@ -103,6 +128,34 @@ class Database extends \Baikal\Model\Config {
         $oMorpho->add(new \Formal\Element\Password([
             "prop"  => "PROJECT_DB_MYSQL_PASSWORD",
             "label" => "MySQL password",
+        ]));
+
+        $oMorpho->add(new \Formal\Element\Checkbox([
+            "prop"            => "PROJECT_DB_POSTGRES",
+            "label"           => "Use Postgres",
+            "help"            => "If checked, Baïkal will use Postgres instead of SQLite.",
+            "refreshonchange" => true,
+        ]));
+
+        $oMorpho->add(new \Formal\Element\Text([
+            "prop"  => "PROJECT_DB_POSTGRES_HOST",
+            "label" => "Postgres host",
+            "help"  => "Host ip or name, including <strong>':portnumber'</strong> if port is not the default one (3306)"
+        ]));
+
+        $oMorpho->add(new \Formal\Element\Text([
+            "prop"  => "PROJECT_DB_POSTGRES_DBNAME",
+            "label" => "Postgres database name",
+        ]));
+
+        $oMorpho->add(new \Formal\Element\Text([
+            "prop"  => "PROJECT_DB_POSTGRES_USERNAME",
+            "label" => "Postgres username",
+        ]));
+
+        $oMorpho->add(new \Formal\Element\Password([
+            "prop"  => "PROJECT_DB_POSTGRES_PASSWORD",
+            "label" => "Postgres password",
         ]));
 
         return $oMorpho;

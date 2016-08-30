@@ -80,6 +80,7 @@ class Database extends \Flake\Core\Controller {
             return true;
         }
         $bMySQLEnabled = $oMorpho->element("PROJECT_DB_MYSQL")->value();
+        $bPostgresEnabled = $oMorpho->element("PROJECT_DB_POSTGRES")->value();
 
         if ($bMySQLEnabled) {
 
@@ -114,6 +115,53 @@ class Database extends \Flake\Core\Controller {
                         # All tables are missing
                         # We add these tables ourselves to the database, to initialize Baïkal
                         $sSqlDefinition = file_get_contents(PROJECT_PATH_CORERESOURCES . "Db/MySQL/db.sql");
+                        $oDb->query($sSqlDefinition);
+                    }
+                }
+
+                return true;
+            } catch (\Exception $e) {
+                $oForm->declareError($oMorpho->element("PROJECT_DB_MYSQL"),
+                    "Baïkal was not able to establish a connexion to the MySQL database as configured.<br />MySQL says: " . $e->getMessage());
+                $oForm->declareError($oMorpho->element("PROJECT_DB_MYSQL_HOST"));
+                $oForm->declareError($oMorpho->element("PROJECT_DB_MYSQL_DBNAME"));
+                $oForm->declareError($oMorpho->element("PROJECT_DB_MYSQL_USERNAME"));
+                $oForm->declareError($oMorpho->element("PROJECT_DB_MYSQL_PASSWORD"));
+            }
+        } else {
+            if ($bPostgresEnabled) {
+
+            $sHost = $oMorpho->element("PROJECT_DB_POSTGRES_HOST")->value();
+            $sDbname = $oMorpho->element("PROJECT_DB_POSTGRES_DBNAME")->value();
+            $sUsername = $oMorpho->element("PROJECT_DB_POSTGRES_USERNAME")->value();
+            $sPassword = $oMorpho->element("PROJECT_DB_POSTGRES_PASSWORD")->value();
+
+            try {
+                $oDb = new \Flake\Core\Database\Postgres(
+                    $sHost,
+                    $sDbname,
+                    $sUsername,
+                    $sPassword
+                );
+
+                if (($aMissingTables = \Baikal\Core\Tools::isDBStructurallyComplete($oDb)) !== true) {
+
+                    # Checking if all tables are missing
+                    $aRequiredTables = \Baikal\Core\Tools::getRequiredTablesList();
+                    if (count($aRequiredTables) !== count($aMissingTables)) {
+                        $sMessage = "<br /><p><strong>Database is not structurally complete.</strong></p>";
+                        $sMessage .= "<p>Missing tables are: <strong>" . implode("</strong>, <strong>", $aMissingTables) . "</strong></p>";
+                        $sMessage .= "<p>You will find the SQL definition of Baïkal tables in this file: <strong>Core/Resources/Db/Postgres/db.sql</strong></p>";
+                        $sMessage .= "<br /><p>Nothing has been saved. <strong>Please, add these tables to the database before pursuing Baïkal initialization.</strong></p>";
+
+                        $oForm->declareError(
+                            $oMorpho->element("PROJECT_DB_POSTGRES"),
+                            $sMessage
+                        );
+                    } else {
+                        # All tables are missing
+                        # We add these tables ourselves to the database, to initialize Baïkal
+                        $sSqlDefinition = file_get_contents(PROJECT_PATH_CORERESOURCES . "Db/Postgres/db.sql");
                         $oDb->query($sSqlDefinition);
                     }
                 }
@@ -197,18 +245,36 @@ class Database extends \Flake\Core\Controller {
 
         if ($oForm->submitted()) {
             $bMySQL = (intval($oForm->postValue("PROJECT_DB_MYSQL")) === 1);
+            $bPostgres = (intval($oForm->postValue("PROJECT_DB_POSTGRES")) === 1);
         } else {
             $bMySQL = PROJECT_DB_MYSQL;
+            $bPOSTGRES = PROJECT_DB_MYSQL;
         }
 
         if ($bMySQL === true) {
             $oMorpho->remove("PROJECT_SQLITE_FILE");
+            $oMorpho->remove("PROJECT_DB_POSTGRES_HOST");
+            $oMorpho->remove("PROJECT_DB_POSTGRES_DBNAME");
+            $oMorpho->remove("PROJECT_DB_POSTGRES_USERNAME");
+            $oMorpho->remove("PROJECT_DB_POSTGRES_PASSWORD");
+        } else {
+          if ($bPostgres === true) {
+            $oMorpho->remove("PROJECT_SQLITE_FILE");
+            $oMorpho->remove("PROJECT_DB_MYSQL_HOST");
+            $oMorpho->remove("PROJECT_DB_MYSQL_DBNAME");
+            $oMorpho->remove("PROJECT_DB_MYSQL_USERNAME");
+            $oMorpho->remove("PROJECT_DB_MYSQL_PASSWORD");
         } else {
 
             $oMorpho->remove("PROJECT_DB_MYSQL_HOST");
             $oMorpho->remove("PROJECT_DB_MYSQL_DBNAME");
             $oMorpho->remove("PROJECT_DB_MYSQL_USERNAME");
             $oMorpho->remove("PROJECT_DB_MYSQL_PASSWORD");
+            $oMorpho->remove("PROJECT_DB_POSTGRES_HOST");
+            $oMorpho->remove("PROJECT_DB_POSTGRES_DBNAME");
+            $oMorpho->remove("PROJECT_DB_POSTGRES_USERNAME");
+            $oMorpho->remove("PROJECT_DB_POSTGRES_PASSWORD");
+        }
         }
     }
 }

@@ -236,7 +236,11 @@ class Framework extends \Flake\Core\Framework {
         if (defined("PROJECT_DB_MYSQL") && PROJECT_DB_MYSQL === true) {
             self::initDbMysql();
         } else {
+        if (defined("PROJECT_DB_POSTGRES") && PROJECT_DB_POSTGRES === true) {
+            self::initDbPostgres();
+        } else {
             self::initDbSqlite();
+        }
         }
     }
 
@@ -294,6 +298,42 @@ class Framework extends \Flake\Core\Framework {
             $GLOBALS["DB"]->query("SET NAMES UTF8");
         } catch (\Exception $e) {
             die("<h3>Baïkal was not able to establish a connexion to the configured MySQL database (as configured in Specific/config.system.php).</h3>");
+        }
+
+        return true;
+    }
+
+
+    protected static function initDbPostgres() {
+
+        if (!defined("PROJECT_DB_POSTGRES_HOST")) {
+            die("<h3>The constant PROJECT_DB_POSTGRES_HOST, containing the Postgres host name, is not set.<br />You should set it in Specific/config.system.php</h3>");
+        }
+
+        if (!defined("PROJECT_DB_POSTGRES_DBNAME")) {
+            die("<h3>The constant PROJECT_DB_POSTGRES_DBNAME, containing the Postgres database name, is not set.<br />You should set it in Specific/config.system.php</h3>");
+        }
+
+        if (!defined("PROJECT_DB_POSTGRES_USERNAME")) {
+            die("<h3>The constant PROJECT_DB_POSTGRES_USERNAME, containing the Postgres database username, is not set.<br />You should set it in Specific/config.system.php</h3>");
+        }
+
+        if (!defined("PROJECT_DB_POSTGRES_PASSWORD")) {
+            die("<h3>The constant PROJECT_DB_POSTGRES_PASSWORD, containing the Postgres database password, is not set.<br />You should set it in Specific/config.system.php</h3>");
+        }
+
+        try {
+            $GLOBALS["DB"] = new \Flake\Core\Database\Postgres(
+                PROJECT_DB_POSTGRES_HOST,
+                PROJECT_DB_POSTGRES_DBNAME,
+                PROJECT_DB_POSTGRES_USERNAME,
+                PROJECT_DB_POSTGRES_PASSWORD
+            );
+
+            # We now setup t6he connexion to use UTF8
+            $GLOBALS["DB"]->query("SET NAMES UTF8");
+        } catch (\Exception $e) {
+            die("<h3>Baïkal was not able to establish a connexion to the configured Postgres database (as configured in Specific/config.system.php).</h3>");
         }
 
         return true;

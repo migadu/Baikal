@@ -70,6 +70,26 @@ class System extends \Baikal\Model\Config {
             "type"    => "string",
             "comment" => "MySQL > Password",
         ],
+        "PROJECT_DB_POSTGRES" => [
+            "type"    => "boolean",
+            "comment" => "Postgres > Use Postgres instead of SQLite ?",
+        ],
+        "PROJECT_DB_POSTGRES_HOST" => [
+            "type"    => "string",
+            "comment" => "Postgres > Host, including ':portnumber' if port is not the default one (3306)",
+        ],
+        "PROJECT_DB_POSTGRES_DBNAME" => [
+            "type"    => "string",
+            "comment" => "Postgres > Database name",
+        ],
+        "PROJECT_DB_POSTGRES_USERNAME" => [
+            "type"    => "string",
+            "comment" => "Postgres > Username",
+        ],
+        "PROJECT_DB_POSTGRES_PASSWORD" => [
+            "type"    => "string",
+            "comment" => "Postgres > Password",
+        ],
         "BAIKAL_ENCRYPTION_KEY" => [
             "type"    => "string",
             "comment" => "A random 32 bytes key that will be used to encrypt data",
@@ -82,18 +102,23 @@ class System extends \Baikal\Model\Config {
 
     # Default values
     protected $aData = [
-        "BAIKAL_AUTH_REALM"         => "BaikalDAV",
-        "BAIKAL_CARD_BASEURI"       => 'PROJECT_BASEURI . "card.php/"',
-        "BAIKAL_CAL_BASEURI"        => 'PROJECT_BASEURI . "cal.php/"',
-        "BAIKAL_DAV_BASEURI"        => 'PROJECT_BASEURI . "dav.php/"',
-        "PROJECT_SQLITE_FILE"       => 'PROJECT_PATH_SPECIFIC . "db/db.sqlite"',
-        "PROJECT_DB_MYSQL"          => false,
-        "PROJECT_DB_MYSQL_HOST"     => "",
-        "PROJECT_DB_MYSQL_DBNAME"   => "",
-        "PROJECT_DB_MYSQL_USERNAME" => "",
-        "PROJECT_DB_MYSQL_PASSWORD" => "",
-        "BAIKAL_ENCRYPTION_KEY"     => "",
-        "BAIKAL_CONFIGURED_VERSION" => "",
+        "BAIKAL_AUTH_REALM"             => "BaikalDAV",
+        "BAIKAL_CARD_BASEURI"           => 'PROJECT_BASEURI . "card.php/"',
+        "BAIKAL_CAL_BASEURI"            => 'PROJECT_BASEURI . "cal.php/"',
+        "BAIKAL_DAV_BASEURI"            => 'PROJECT_BASEURI . "dav.php/"',
+        "PROJECT_SQLITE_FILE"           => 'PROJECT_PATH_SPECIFIC . "db/db.sqlite"',
+        "PROJECT_DB_MYSQL"              => false,
+        "PROJECT_DB_MYSQL_HOST"         => "",
+        "PROJECT_DB_MYSQL_DBNAME"       => "",
+        "PROJECT_DB_MYSQL_USERNAME"     => "",
+        "PROJECT_DB_MYSQL_PASSWORD"     => "",
+        "PROJECT_DB_POSTGRES"           => false,
+        "PROJECT_DB_POSTGRES_HOST"      => "",
+        "PROJECT_DB_POSTGRES_DBNAME"    => "",
+        "PROJECT_DB_POSTGRES_USERNAME"  => "",
+        "PROJECT_DB_POSTGRES_PASSWORD"  => "",
+        "BAIKAL_ENCRYPTION_KEY"         => "",
+        "BAIKAL_CONFIGURED_VERSION"     => "",
     ];
 
     function formMorphologyForThisModelInstance() {
@@ -154,6 +179,34 @@ class System extends \Baikal\Model\Config {
             "prop"            => "PROJECT_DB_MYSQL",
             "label"           => "Use MySQL",
             "help"            => "If checked, Baïkal will use MySQL instead of SQLite.",
+            "refreshonchange" => true,
+        ]));
+
+        $oMorpho->add(new \Formal\Element\Text([
+            "prop"  => "PROJECT_DB_MYSQL_HOST",
+            "label" => "MySQL host",
+            "help"  => "Host ip or name, including ':portnumber' if port is not the default one (3306)"
+        ]));
+
+        $oMorpho->add(new \Formal\Element\Text([
+            "prop"  => "PROJECT_DB_MYSQL_DBNAME",
+            "label" => "MySQL database name",
+        ]));
+
+        $oMorpho->add(new \Formal\Element\Text([
+            "prop"  => "PROJECT_DB_MYSQL_USERNAME",
+            "label" => "MySQL username",
+        ]));
+
+        $oMorpho->add(new \Formal\Element\Password([
+            "prop"  => "PROJECT_DB_MYSQL_PASSWORD",
+            "label" => "MySQL password",
+        ]));
+
+        $oMorpho->add(new \Formal\Element\Checkbox([
+            "prop"            => "PROJECT_DB_POSTGRES",
+            "label"           => "Use Postgres",
+            "help"            => "If checked, Baïkal will use Postgres instead of SQLite.",
             "refreshonchange" => true,
         ]));
 
