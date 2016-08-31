@@ -331,7 +331,7 @@ class Framework extends \Flake\Core\Framework {
             );
 
             # We now setup t6he connexion to use UTF8
-            $GLOBALS["DB"]->query("SET NAMES UTF8");
+            # $GLOBALS["DB"]->query("SET NAMES UTF8");
         } catch (\Exception $e) {
             die("<h3>Baïkal was not able to establish a connexion to the configured Postgres database (as configured in Specific/config.system.php).</h3>");
         }
