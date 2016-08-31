@@ -45,7 +45,7 @@ class Postgres extends \Flake\Core\Database {
         $this->sPassword = $sPassword;
 
         $this->oDb = new \PDO(
-            'postgres:host=' . $this->sHost . ';dbname=' . $this->sDbName,
+            'pgsql:host=' . $this->sHost . ';dbname=' . $this->sDbName,
             $this->sUsername,
             $this->sPassword
         );
