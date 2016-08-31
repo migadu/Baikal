@@ -39,7 +39,7 @@ class Database extends \Flake\Core\Controller {
         $this->oForm = $this->oModel->formForThisModelInstance([
             "close"           => false,
             "hook.validation" => [$this, "validateConnection"],
-            "hook.morphology" => [$this, "hideMySQLFieldWhenNeeded"],
+            "hook.morphology" => [$this, "hideOtherDbFieldWhenNeeded"],
         ]);
 
         if ($this->oForm->submitted()) {
@@ -168,12 +168,12 @@ class Database extends \Flake\Core\Controller {
 
                 return true;
             } catch (\Exception $e) {
-                $oForm->declareError($oMorpho->element("PROJECT_DB_MYSQL"),
-                    "Baïkal was not able to establish a connexion to the MySQL database as configured.<br />MySQL says: " . $e->getMessage());
-                $oForm->declareError($oMorpho->element("PROJECT_DB_MYSQL_HOST"));
-                $oForm->declareError($oMorpho->element("PROJECT_DB_MYSQL_DBNAME"));
-                $oForm->declareError($oMorpho->element("PROJECT_DB_MYSQL_USERNAME"));
-                $oForm->declareError($oMorpho->element("PROJECT_DB_MYSQL_PASSWORD"));
+                $oForm->declareError($oMorpho->element("PROJECT_DB_POSTGRES"),
+                    "Baïkal was not able to establish a connexion to the Postgres database as configured.<br />Postgres says: " . $e->getMessage());
+                $oForm->declareError($oMorpho->element("PROJECT_DB_POSTGRES_HOST"));
+                $oForm->declareError($oMorpho->element("PROJECT_DB_POSTGRES_DBNAME"));
+                $oForm->declareError($oMorpho->element("PROJECT_DB_POSTGRES_USERNAME"));
+                $oForm->declareError($oMorpho->element("PROJECT_DB_POSTGRES_PASSWORD"));
             }
         } else {
 
@@ -242,7 +242,7 @@ class Database extends \Flake\Core\Controller {
         }
     }
 
-    function hideMySQLFieldWhenNeeded(\Formal\Form $oForm, \Formal\Form\Morphology $oMorpho) {
+    function hideOtherDbFieldWhenNeeded(\Formal\Form $oForm, \Formal\Form\Morphology $oMorpho) {
 
         if ($oForm->submitted()) {
             $bMySQL = (intval($oForm->postValue("PROJECT_DB_MYSQL")) === 1);
