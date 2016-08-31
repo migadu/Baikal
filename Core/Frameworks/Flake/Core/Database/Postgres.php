@@ -55,7 +55,8 @@ class Postgres extends \Flake\Core\Database {
     function tables() {
         $aTables = [];
 
-        $sSql = "SHOW TABLES FROM `" . $this->sDbName . "`";
+        # $sSql = "SHOW TABLES FROM `" . $this->sDbName . "`";
+        $sSql = "SELECT table_name FROM information_schema.tables where table_schema = 'public';
         $oStmt = $this->query($sSql);
 
         while (($aRs = $oStmt->fetch()) !== false) {
